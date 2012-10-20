@@ -109,25 +109,27 @@ consultarPreguntaCrucial :: Maybe Oraculo -> IO ()
 consultarPreguntaCrucial (Nothing) = putStrLn "Oráculo vacío." >> menu Nothing
 consultarPreguntaCrucial (Just p) = 
     do
-        putStrLn "Introduzca la primera predicción:"
+        putStrLn "\nIntroduzca la primera predicción:"
         cadena1 <- getLine
-        putStrLn "Introduzca la segunda predicción:"
+        putStrLn "\nIntroduzca la segunda predicción:"
         cadena2 <- getLine
         case (obtenerCadena p (map Char.toLower cadena1) , obtenerCadena p (map Char.toLower cadena2)) of
              (Nothing, _) -> putStrLn "Consulta Invalida." >> menu (Just p)
              (_, Nothing) -> putStrLn "Consulta Invalida." >> menu (Just p)
              (Just c1, Just c2) -> do
+                 putStr "\nLa pregunta crucial es: "
                  putStr "¿"
-                 putStr (last(elementoComun (map fst c1) (map fst c2))) >> menu (Just p)
-                 putStrLn "?"
+                 putStr (last(elementoComun (map fst c1) (map fst c2)))
+                 putStr "?\n"
+                 menu (Just p)
              
 consultarEstadisticas :: Maybe Oraculo -> IO ()
 consultarEstadisticas p =
     do
         case p of
-             Nothing -> putStrLn "Consulta Inválida. Oráculo Vacío."
+             Nothing -> putStrLn "\nConsulta Inválida. Oráculo Vacío." >> menu Nothing
              Just p -> do
-                 putStrLn "Las estadísticas del oráculo son:"
+                 putStr "Las estadísticas del oráculo son: "
                  putStrLn (show (obtenerEstadisticas p)) >> menu (Just p)
              
 elementoComun :: Eq a => [a] -> [a] -> [a]
