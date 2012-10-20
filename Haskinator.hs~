@@ -18,16 +18,15 @@ main = menu Nothing
 menu :: Maybe Oraculo -> IO ()
 menu p =
     do
-        putStrLn "\nHaskinator"
-        putStrLn "Opciones:"
-        putStrLn "0) Salir"
-        putStrLn "1) Crear un Oráculo Nuevo"
-        putStrLn "2) Predecir"
-        putStrLn "3) Persistir"
-        putStrLn "4) Cargar"
-        putStrLn "5) Consultar Pregunta Crucial"
-        putStrLn "6) Consultar Estadísticas"
-        putStrLn "\n"
+        putStrLn "\nBienvenido al Haskinator. Seleccione una opción:"
+        putStrLn "\nOpciones:"
+        putStrLn "0) Salir."
+        putStrLn "1) Crear un Oráculo Nuevo."
+        putStrLn "2) Predecir."
+        putStrLn "3) Persistir."
+        putStrLn "4) Cargar."
+        putStrLn "5) Consultar Pregunta Crucial."
+        putStrLn "6) Consultar Estadísticas\n.  "
         opcion <- getLine
         case opcion of
             "0" -> putStrLn "\nBueno, chao\n"
@@ -37,6 +36,7 @@ menu p =
             "4" -> cargar
             "5" -> consultarPreguntaCrucial p
             "6" -> consultarEstadisticas p
+            _   -> putStrLn "Opción inválida" >> menu p
         
 crearNuevoOraculo :: IO ()
 crearNuevoOraculo = putStrLn "\nNuevo Oráculo Creado." >> menu Nothing
@@ -52,10 +52,9 @@ predecir (Just p) = caminaOraculo (Just p) p []
 caminaOraculo :: Maybe Oraculo -> Oraculo -> [(String, Bool, Oraculo)] -> IO ()
 caminaOraculo oraculo (Pregunta q p n) l =
     do
-        putStrLn "\n"
-        putStr "¿"
+        putStr "\n¿"
         putStr q
-        putStrLn "?\n"
+        putStrLn "?"
         respuesta <- getLine
         case map Char.toLower respuesta of
              "si" -> si
@@ -66,8 +65,10 @@ caminaOraculo oraculo (Pregunta q p n) l =
           no = caminaOraculo oraculo n (l ++ [(q, False, p)])
 caminaOraculo oraculo (Prediccion s) l = 
     do
-        putStrLn s
-        putStrLn "¿Es correcta la predicción?"
+        putStr "\nLa respuesta es "
+        putStr s
+        putStrLn ".\n"
+        putStrLn "¿Es correcta la predicción dada?"
         respuesta <- getLine
         case map Char.toLower respuesta of
              "si" -> si
@@ -92,14 +93,14 @@ persistir :: Maybe Oraculo -> IO ()
 persistir (Nothing) = putStrLn "Oráculo vacío" >> menu Nothing
 persistir (Just p) =
     do
-        putStrLn "Introduzca un nombre de archivo:"
+        putStrLn "Introduzca el nombre con el que desea guardar el archivo:"
         archivo <- getLine
         writeFile archivo $ show p
         menu (Just p)
                 
 cargar :: IO ()
 cargar = do
-        putStrLn "Introduzca un nombre de archivo:"
+        putStrLn "\nIntroduzca el nombre del archivo que desea cargar:"
         archivo <- getLine
         oraculo <- readFile archivo
         menu (Just (read oraculo))
@@ -108,21 +109,26 @@ consultarPreguntaCrucial :: Maybe Oraculo -> IO ()
 consultarPreguntaCrucial (Nothing) = putStrLn "Oráculo vacío." >> menu Nothing
 consultarPreguntaCrucial (Just p) = 
     do
-        putStrLn "Introduzca la primera prediccion:"
+        putStrLn "Introduzca la primera predicción:"
         cadena1 <- getLine
-        putStrLn "Introduzca la segunda prediccion:"
+        putStrLn "Introduzca la segunda predicción:"
         cadena2 <- getLine
         case (obtenerCadena p (map Char.toLower cadena1) , obtenerCadena p (map Char.toLower cadena2)) of
              (Nothing, _) -> putStrLn "Consulta Invalida." >> menu (Just p)
              (_, Nothing) -> putStrLn "Consulta Invalida." >> menu (Just p)
-             (Just c1, Just c2) -> putStrLn (last(elementoComun (map fst c1) (map fst c2))) >> menu (Just p)
+             (Just c1, Just c2) -> do
+                 putStr "¿"
+                 putStr (last(elementoComun (map fst c1) (map fst c2))) >> menu (Just p)
+                 putStrLn "?"
              
 consultarEstadisticas :: Maybe Oraculo -> IO ()
 consultarEstadisticas p =
     do
         case p of
              Nothing -> putStrLn "Consulta Inválida. Oráculo Vacío."
-             Just p -> putStrLn (show (obtenerEstadisticas p)) >> menu (Just p)
+             Just p -> do
+                 putStrLn "Las estadísticas del oráculo son:"
+                 putStrLn (show (obtenerEstadisticas p)) >> menu (Just p)
              
 elementoComun :: Eq a => [a] -> [a] -> [a]
 elementoComun [] _ = []
