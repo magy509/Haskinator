@@ -10,6 +10,7 @@ module Main (main) where
 import Char
 import Data.Char
 import Oraculo
+import System.Directory
 
 main :: IO ()
 
@@ -44,7 +45,7 @@ crearNuevoOraculo = putStrLn "\nNuevo Oráculo Creado." >> menu Nothing
 predecir :: Maybe Oraculo -> IO ()
 predecir Nothing = 
     do
-        putStrLn "No hay predicción hasta ahora. Introduzca una nueva predicción:"
+        putStrLn "\nNo hay predicción hasta ahora. Introduzca una nueva predicción:"
         respuesta <- getLine
         menu (Just (Prediccion respuesta))
 predecir (Just p) = caminaOraculo (Just p) p []
@@ -94,7 +95,7 @@ persistir (Nothing) = putStrLn "Oráculo vacío" >> menu Nothing
 persistir (Just p) =
     do
         putStrLn "Introduzca el nombre con el que desea guardar el archivo:"
-        archivo <- getLine
+        archivo <- getLine                
         writeFile archivo $ show p
         menu (Just p)
                 
@@ -102,11 +103,17 @@ cargar :: IO ()
 cargar = do
         putStrLn "\nIntroduzca el nombre del archivo que desea cargar:"
         archivo <- getLine
+        verificaArchivo archivo
         oraculo <- readFile archivo
         menu (Just (read oraculo))
+        
+verificaArchivo :: String -> IO ()
+verificaArchivo
+    | doesFileExist = return
+    | otherwise = putStrLn "Nombre de Archivo Incorrecto." >> cargar
                 
 consultarPreguntaCrucial :: Maybe Oraculo -> IO ()
-consultarPreguntaCrucial (Nothing) = putStrLn "Oráculo vacío." >> menu Nothing
+consultarPreguntaCrucial (Nothing) = putStrLn "Consulta Inválida. Oráculo vacío." >> menu Nothing
 consultarPreguntaCrucial (Just p) = 
     do
         putStrLn "\nIntroduzca la primera predicción:"

@@ -44,7 +44,7 @@ crearNuevoOraculo = putStrLn "\nNuevo Oráculo Creado." >> menu Nothing
 predecir :: Maybe Oraculo -> IO ()
 predecir Nothing = 
     do
-        putStrLn "No hay predicción hasta ahora. Introduzca una nueva predicción:"
+        putStrLn "\nNo hay predicción hasta ahora. Introduzca una nueva predicción:"
         respuesta <- getLine
         menu (Just (Prediccion respuesta))
 predecir (Just p) = caminaOraculo (Just p) p []
@@ -106,7 +106,7 @@ cargar = do
         menu (Just (read oraculo))
                 
 consultarPreguntaCrucial :: Maybe Oraculo -> IO ()
-consultarPreguntaCrucial (Nothing) = putStrLn "Oráculo vacío." >> menu Nothing
+consultarPreguntaCrucial (Nothing) = putStrLn "Consulta Inválida. Oráculo vacío." >> menu Nothing
 consultarPreguntaCrucial (Just p) = 
     do
         putStrLn "\nIntroduzca la primera predicción:"
