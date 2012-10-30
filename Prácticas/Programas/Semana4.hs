@@ -1,0 +1,39 @@
+module SemanaIV where
+
+factorial :: Integer -> Integer
+factorial 0 = 1
+factorial n = n * factorial (n-1)
+
+log2Iter :: Integer -> Integer
+log2Iter 0 = 1
+log2Iter n = 1 + (log2Iter (n `div` 2))
+
+reverso :: [a] -> [a]
+reverso xs = foldl (\acc y -> y : acc) [] xs
+
+replicar :: Integer -> a -> [a]
+replicar 0 e = []
+replicar n e = [e] ++ replicar (n-1) e
+
+--mezclarCon :: (a -> b -> c) -> [a] -> [b] -> [c]
+--mezclarCon
+
+suma :: (Num a) => [a] -> a
+suma [] = 0;
+suma (x:xs) = (foldr1 (+) xs) + x
+
+filtra :: (a -> Bool) -> [a] -> [a]
+filtra f [] = []
+filtra f (x:xs) = foldr (\x xs -> if f x then x:xs else xs ) [] xs
+
+--ordenar :: (Ord a) => [a] -> [a]
+--ordenar [] = []
+
+--data Arbol a = Hoja a | Rama (Arbol a) a (Arbol a) a (Arbol a)
+
+--aplanar :: Arbol a -> [a]
+
+--esDeBusqueda :: (Ord a) => Arbol a -> Bool
+
+
+
