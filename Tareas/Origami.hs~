@@ -41,7 +41,17 @@ analizarOrigami :: (Ord a) => Origami a -> Maybe(a, a, Bool)
 analizarOrigami = plegarOrigami transPapel transPico transValle transCompuesto
     where
         transPapel = Nothing
-        transPico = 
-        transValle = 
-        transCompuesto = 
-            
+        transPico = (\elem resto ->
+            case resto of
+                 Nothing -> Just(elem, elem, True)
+                 Just (minimo, maximo, orden) -> Just(min elem minimo, max elem maximo, orden && elem <= minimo))
+        transValle = (\elem resto ->
+            case resto of
+                 Nothing -> Just(elem, elem, True)
+                 Just (minimo, maximo, orden) -> Just(min elem minimo, max elem maximo, orden && elem <= minimo))
+        transCompuesto = (\resto1 resto2 ->
+            case (resto1, resto2) of
+                 (Nothing, Nothing) -> Nothing
+                 (Nothing, (Just (minimo, maximo, orden))) -> Just (minimo, maximo, orden)
+                 (Just (minimo, maximo, orden), Nothing) -> Just (minimo, maximo, orden)
+                 (Just (minimo1, maximo1, orden1), Just (minimo2, maximo2, orden2)) -> Just (min minimo1 minimo2, max maximo1 maximo2, orden1 && orden2 && maximo1 <= maximo2))
