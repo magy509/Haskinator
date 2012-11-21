@@ -67,12 +67,13 @@ salta([']'|C],C):-
 salta(['['|C],C1):-
     debuguea('abre', C),
     salta(C,C2),
+    !,
     salta(C2,C1),
     !.
 
 salta([H|C],C1):-
     debuguea(H, C),
-    not(H=']'), not(H='['), % FIXME
+    %    not(H=']'), not(H='['), % FIXME
     salta(C,C1),
     !.
 
