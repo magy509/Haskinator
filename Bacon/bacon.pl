@@ -12,12 +12,21 @@ leer(X):-
 
 leer([]).
 
-correr(C,F):-
+ceros(1,[]):-!. %FIXME
+
+ceros(N,[X|Xs]):-
+    N > 0,
+    X is 0,
+    M is N - 1,
+    ceros(M,Xs),
+    !.
+
+correr(C, F):-
     atom_chars(C, Is),
     inicial(X),
-    ejecutar(X, Is, F).
+    ejecutar(0, X, Is, F),!.
 
-inicial(estado([],0,[0,0,0,0,0,0,0,0,0,0])).
+inicial(estado([],0,[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])).
 
 interpretar(I,[],I).
 
@@ -38,7 +47,7 @@ interpretar(estado(Anterior,Actual,[P|Ps]),'>',estado([Actual|Anterior],P,Ps)):-
 interpretar(estado([A|As],Actual,Posterior),'<',estado(As,A,[Actual|Posterior])):-!.
 
 %Lectura
-interpretar(estado(Anterior,Actual,Posterior),',',estado(Anterior,Nuevo,Posterior)):-
+interpretar(estado(Anterior,_,Posterior),',',estado(Anterior,Nuevo,Posterior)):-
     get_single_char(Nuevo),
     !.
 
@@ -50,7 +59,7 @@ interpretar(estado(Anterior,Actual,Posterior),'.',estado(Anterior,Actual,Posteri
 %Iteración
 
 %Comentarios
-interpretar(I,_,I):-!.
+interpretar(I, _, I):-!.
 
 
 debuguea(M, C):- write(M), write(' '), write(C), put(10).
@@ -61,44 +70,45 @@ salta([],_):-
     !,fail.
 
 salta([']'|C],C):-
-    debuguea('cierra', C),
     !.
 
 salta(['['|C],C1):-
-    debuguea('abre', C),
-    salta(C,C2),
+    salta(C, C2),
     !,
-    salta(C2,C1),
+    salta(C2, C1),
     !.
 
-salta([H|C],C1):-
-    debuguea(H, C),
-    %    not(H=']'), not(H='['), % FIXME
-    salta(C,C1),
+salta([_|C],C1):-
+    salta(C, C1),
+    !.
+
+restar(0,_):-
+    !,fail.
+
+restar(X,N):-
+    N is X - 1,
     !.
 
 %Interpretar
-ejecutar(F,[],F):-!.
+ejecutar(_, F, [], F):-!.
 
-ejecutar(estado(Anterior,0,Posterior),['['|T],Final):-
-    salta(T,T1),
-    ejecutar(estado(Anterior,0,Posterior),T1,Final),
+ejecutar(X, estado(Anterior,0,Posterior), ['['|T], Final):-
+    salta(T, T1),
+    ejecutar(X, estado(Anterior,0,Posterior), T1, Final),
     !.
 
-ejecutar(I,['['|T],Final):-
-    ejecutar(I,T,M),
-    ejecutar(M,['['|T],Final),
+ejecutar(X, I, ['['|T], Final):-
+    N is X + 1,
+    debuguea(I, N),
+    ejecutar(N, I, T, M),
+    ejecutar(X, M, ['['|T], Final),
     !.
 
-ejecutar(estado(Anterior,0,Posterior),[']'|T],Final):-
-    ejecutar(estado(Anterior,0,Posterior),T,Final),
-    !.
+ejecutar(_, estado(Anterior,0,Posterior), [']'|_], estado(Anterior,0,Posterior)):-!.
 
-ejecutar(I,[']'|T],I):-
-    !.
+ejecutar(_, I, [']'|_], I):-!.
 
-ejecutar(I,[E|L],F):-
-    interpretar(I,E,M),
-    ejecutar(M,L,F),!.
-
+ejecutar(X, I, [E|L], F):-
+    interpretar(I, E, M),
+    ejecutar(X, M, L, F),!.
 
