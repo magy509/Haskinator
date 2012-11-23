@@ -23,14 +23,9 @@ ceros(N, [X|Xs]):-
 
 ceros(_,_):-!,fail.
 
-correr(I,P,F):-
-    ceros(I,E),
+correr(I,P,_):-
     cargar(P,L),
-%    atom_chars(C, Is),
-%    inicial(X),
-    ejecutar(0, estado([],0,E), L, F),!.
-
-inicial(estado([],0,[0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0,0])).
+    ejecutar(I,L),
 
 interpretar(I, [], I).
 
@@ -122,6 +117,15 @@ ejecutar(_, []):-
     !,fail.
 
 ejecutar(K, L):-
-    ejecutar(0, estado([], 0, I), L, _),
     ceros(K, I),
+    ejecutar(0, estado([], 0, I), L, _),
     !.
+
+brainfk:-
+    write('Archivo'),
+    nl,
+    read(X),
+    nl,
+    correr(100,X,_),
+    !.
+
