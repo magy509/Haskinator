@@ -1,5 +1,5 @@
 cargar(X,L):-
-    see(X),
+    catch(see(X), _, (write('No se encuentra el archivo.'),fail)),
     leer(L),
     seen,
     !.
@@ -128,4 +128,3 @@ brainfk:-
     nl,
     correr(100,X,_),
     !.
-
