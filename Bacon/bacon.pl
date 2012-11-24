@@ -12,10 +12,22 @@ leer(X):-
 
 leer([]).
 
-ceros(1, []):-!. %FIXME
+verificar(0,[]):- !.
+
+verificar(_,[]):-!,write('Fallo Miserablemente\n'),fail.
+
+verificar(I,_):- I < 0, write('Fallo Miserablemente\n'), !, fail.
+
+verificar(I,['['|L]):- !, N is I + 1, verificar(N,L).
+
+verificar(I,[']'|L]):- !, N is I - 1, verificar(N,L).
+
+verificar(I,[_|L]):-!, verificar(I,L).
+
+ceros(1, []):-!.
 
 ceros(N, [X|Xs]):-
-    N > 0,
+    N > 1,
     X is 0,
     M is N - 1,
     ceros(M,Xs),
@@ -25,7 +37,8 @@ ceros(_,_):-!,fail.
 
 correr(I,P,_):-
     cargar(P,L),
-    ejecutar(I,L),
+    verificar(0,L),
+    ejecutar(I,L).
 
 interpretar(I, [], I).
 
@@ -35,12 +48,12 @@ interpretar(estado(Anterior, Actual, Posterior), '+', estado(Anterior, Nuevo, Po
     !.
 
 %Decremento
-interpretar(estado(Anterior, Actual, Posterior),'-', estado(Anterior, Nuevo, Posterior)):-
+interpretar(estado(Anterior, Actual, Posterior), '-', estado(Anterior, Nuevo, Posterior)):-
     Nuevo is Actual-1,
     !.
 
 %Avance
-interpretar(estado(Anterior, Actual, [P|Ps]),'>',estado([Actual|Anterior], P, Ps)):-!.
+interpretar(estado(Anterior, Actual, [P|Ps]), '>',estado([Actual|Anterior], P, Ps)):-!.
 
 %Retroceso
 interpretar(estado([A|As], Actual, Posterior), '<', estado(As, A, [Actual|Posterior])):-!.
@@ -51,17 +64,14 @@ interpretar(estado(Anterior, _, Posterior), ',', estado(Anterior, Nuevo, Posteri
     !.
 
 %Escritura
-interpretar(estado(Anterior, Actual, Posterior),'.',estado(Anterior, Actual, Posterior)):-
+interpretar(estado(Anterior, Actual, Posterior), '.',estado(Anterior, Actual, Posterior)):-
     put(Actual),
     !.
-
-%Iteración
 
 %Comentarios
 interpretar(I, _, I):-!.
 
-
-debuguea(M, C):- write(M), write(' '), write(C), put(10).
+%debuguea(M, C):- write(M), write(' '), write(C), put(10).
 
 %Salta en Lista
 
@@ -81,13 +91,6 @@ salta([_|C], C1):-
     salta(C, C1),
     !.
 
-restar(0, _):-
-    !,fail.
-
-restar(X, N):-
-    N is X - 1,
-    !.
-
 %Interpretar
 ejecutar(_, F, [], F):-!.
 
@@ -97,6 +100,7 @@ ejecutar(X, estado(Anterior, 0, Posterior), ['['|T], F):-
     !.
 
 ejecutar(X, I, ['['|T], F):-
+    !,
     N is X + 1,
     ejecutar(N, I, T, M),
     ejecutar(X, M, ['['|T], F),
@@ -110,11 +114,11 @@ ejecutar(X, I, [E|L], F):-
     interpretar(I, E, M),
     ejecutar(X, M, L, F),!.
 
-ejecutar(1, _):-
-    !,fail.
+ejecutar(1, L):-
+    ejecutar(0, estado([],0,[]), L, _),
+    !.
 
-ejecutar(_, []):-
-    !,fail.
+ejecutar(_, []):-!. %FIXME
 
 ejecutar(K, L):-
     ceros(K, I),
@@ -122,7 +126,7 @@ ejecutar(K, L):-
     !.
 
 brainfk:-
-    write('Archivo'),
+    write('Por favor, escriba el nombre del programa en Brainf**k que desea interpretar:'),
     nl,
     read(X),
     nl,
